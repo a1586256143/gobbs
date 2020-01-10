@@ -1,0 +1,23 @@
+{{ template "header" . }}
+	<div class="layui-container">
+		<button class="layui-btn publish">发布主题</button>
+		<ul>
+			{{ range .list }}
+				<li><a href="/?cid={{ .Id }}">{{ .Name }}</a></li>
+			{{ end }}
+		</ul>
+	</div>
+{{ template "footer" . }}
+<script>
+	//Demo
+	layui.use('form', function(){
+		$('.publish').click(function(){
+			layer.open({
+				type : 2 ,
+				content : '/publish' ,
+				title : '发布主题' ,
+				area : ['500px','300px']
+			})
+		})
+	});
+</script>

@@ -1,0 +1,51 @@
+{{ define "header" }}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Hello</title>
+	<link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+	<link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+<body>
+	<ul class="layui-nav" lay-filter="">
+		<div class="layui-container">
+		<li class="layui-nav-item">畅所欲言</li>
+		<li class="layui-nav-item"><a href="">最新发布</a></li>
+		{{ if .userInfo.Id }}
+			<li class="layui-nav-item">
+				<a href="javascript:;">{{ .userInfo.Name }}</a>
+			</li>
+			<li class="layui-nav-item"><a href="/logout">退出</a></li>
+		{{ else }}
+			<li class="layui-nav-item"><a href="/login">登录</a></li>
+			<li class="layui-nav-item"><a href="/register">注册</a></li>
+		{{ end }}
+		</div>
+	</ul>
+	<br>
+{{ end }}
+{{ define "head" }}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Hello</title>
+	<link rel="stylesheet" href="/static/layui/css/layui.css" media="all">
+	<link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+<body>
+{{ end }}
+{{ define "footer" }}
+</body>
+<script type="text/javascript" src="https://cdn.staticfile.org/jquery/2.0.0/jquery.min.js"></script>
+<script type="text/javascript" src="/static/layui/layui.js"></script>
+<script>
+	//注意：导航 依赖 element 模块，否则无法进行功能性操作
+	layui.use('element', function(){
+	var element = layui.element;
+
+	});
+</script>
+</html>
+{{ end }}
