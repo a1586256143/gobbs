@@ -1,10 +1,10 @@
 {{ template "head" . }}
 <div class="layui-container" style="margin-top: 15px;">
-    <form method="post" action="/login" class="layui-form">
+    <form method="post" action="/publish" class="layui-form">
         <div class="layui-form-item">
             <label class="layui-form-label">标题</label>
             <div class="layui-input-block">
-                <input type="text" name="name" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+                <input type="text" name="title" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
             </div>
         </div>
         <div class="layui-form-item">
@@ -29,14 +29,14 @@
 
         //监听提交
         form.on('submit(submit)', function(data){
-            $.post('/login' , data.field , (data) => {
+            $.post('/publish' , data.field , (data) => {
                 if (data.status) {
                     layer.msg(data.msg)
                     return;
                 }
                 layer.msg(data.msg)
                 setTimeout(() => {
-                    window.location.href = '/';
+                    window.parent.location.reload();
                 } , 1500);
             } , 'json');
             return false;

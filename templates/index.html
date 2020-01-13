@@ -1,11 +1,34 @@
 {{ template "header" . }}
-	<div class="layui-container">
-		<button class="layui-btn publish">发布主题</button>
-		<ul>
-			{{ range .list }}
-				<li><a href="/?cid={{ .Id }}">{{ .Name }}</a></li>
+	<div class="layui-container index">
+		<div class="navs">
+			<button class="layui-btn publish">发布主题</button>
+			<ul>
+				<li><a href="/">全部</a></li>
+				{{ range .navs }}
+					<li><a href="/?cid={{ .Id }}">{{ .Name }}</a></li>
+				{{ end }}
+			</ul>
+		</div>
+		<div class="list">
+			{{ if .list }}
+				{{ range .list }}
+				<div class="layui-row">
+					<div class="layui-col-md9">
+						{{ .Title }}
+					</div>
+					<div class="layui-col-md3">
+						{{ .FormatTime }}
+					</div>
+				</div>
+				{{ end }}
+			{{ else }}
+				<div class="layui-row">
+					<div class="layui-col-md12" style="text-align:left">
+						暂时没有信息
+					</div>
+				</div>
 			{{ end }}
-		</ul>
+		</div>
 	</div>
 {{ template "footer" . }}
 <script>

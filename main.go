@@ -1,5 +1,6 @@
 package main
 
+import "C"
 import (
 	"./common"
 	"fmt"
@@ -38,8 +39,7 @@ func main(){
 	// 首页
 	router.GET("/" , AuthMiddleware() , func(c *gin.Context){
 		cid := c.DefaultQuery("cid" , "0")
-		fmt.Println("cid = " , cid)
-		list := []struct{
+		navs := []struct{
 			Name string
 			Id int
 		}{
@@ -53,10 +53,25 @@ func main(){
 		if userInfo.Last_time != 0 {
 			lastTime = common.DateFormat(userInfo.Last_time)
 		}
+		// 获取列表
+		rows, _ := common.MysqlDb.Query("select id,title,create_time from article where status = 0 and cid = ? order by create_time desc" , cid)
+		var articles []models.Article
+		if rows != nil{
+			for rows.Next(){
+				article := models.Article{}
+				rows.Scan(&article.Id , &article.Title , &article.CreateTime)
+				if article.CreateTime != 0{
+					article.FormatTime = common.DateFormat(article.CreateTime)
+				}
+				articles = append(articles, article)
+			}
+		}
+
 		c.HTML(200 , "index.html" , gin.H{
 			"userInfo" : userInfo,
 			"last_time" : lastTime ,
-			"list" : list ,
+			"navs" : navs ,
+			"list" : articles ,
 		})
 	})
 
@@ -74,10 +89,16 @@ func main(){
 	router.POST("/login" , func(c *gin.Context){
 		user := c.PostForm("name")
 		password := c.PostForm("password")
-		fmt.Println("password" , common.PasswordEncode(password))
 		// 调用登录方法
 		userInfo := models.Login(user)
 		if userInfo.Id != 0{
+			if common.PasswordEncode(password) != userInfo.Password {
+				c.JSON(200 , gin.H{
+					"status" : 1 ,
+					"msg" : "用户名或密码错误",
+				})
+				return
+			}
 			// 保存用户登陆Cookie信息
 			models.SaveLoginCookie(c , userInfo)
 			t := common.GetUnix()
@@ -110,7 +131,7 @@ func main(){
 			rowsAffected , _ := ret.RowsAffected()
 			lastInsertID,_ := ret.LastInsertId()
 			if rowsAffected > 0 {
-				userInfo = models.User{Id : int(lastInsertID) , Name : user , Last_time:t}
+				userInfo = models.User{Id : lastInsertID , Name : user , Last_time:t}
 				// 保存登录信息
 				models.SaveLoginCookie(c , userInfo)
 				c.JSON(200 , gin.H{
@@ -135,6 +156,40 @@ func main(){
 	// 发布页面
 	router.GET("/publish" , func(c *gin.Context){
 		c.HTML(http.StatusOK , "publish.html" , gin.H{})
+	})
+
+	// 发布处理
+	router.POST("/publish" , func(c *gin.Context) {
+		title := c.PostForm("title")
+		content := c.PostForm("content")
+		if title == "" {
+			c.JSON(200 , gin.H{
+				"status" : 1 ,
+				"msg" : "标题不能为空" ,
+			})
+			return
+		}
+		if content == "" {
+			c.JSON(200 , gin.H{
+				"status" : 1 ,
+				"msg" : "内容不能为空" ,
+			})
+			return
+		}
+		cookie , _ := c.Cookie("user")
+		uid := models.GetUserInfo(cookie).Id
+		status := models.AddArticle(uid , title , content , 0)
+		if status == 0 {
+			c.JSON(200 , gin.H{
+				"status" : 1 ,
+				"msg" : "发布失败，请重新尝试" ,
+			})
+			return
+		}
+		c.JSON(200 , gin.H{
+			"status" : 0 ,
+			"msg" : "发布成功" ,
+		})
 	})
 
 	router.Run(":9999")

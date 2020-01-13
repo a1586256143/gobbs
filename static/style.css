@@ -1,3 +1,40 @@
 body{
-	background: #eee;
+	background: #efefef;
+}
+.index{
+	display: flex;
+}
+.list{
+	width: 70%;
+}
+.navs{
+	width: 25%;
+	margin-right: 5%;
+}
+.list .layui-row{
+	margin-bottom: 1rem;
+	background: white;
+	padding: 1rem 0;
+	border-bottom-right-radius: 10px;
+	border-top-left-radius: 10px;
+}
+.list .layui-row div:first-child {
+	padding-left: 1rem;
+}
+.list .layui-row div:last-child {
+	color: #666666;
+	text-align: right;
+	padding-right: 1rem;
+	font-size: 90%;
+}
+.navs ul{
+	list-style-type: none;
+	margin-top: 1rem;
+}
+.navs ul li {
+	padding: 1rem 2rem;
+	background:white;
+	margin-bottom:.5rem;
+	border-top-left-radius: 10px;
+	border-bottom-right-radius: 10px;
 }

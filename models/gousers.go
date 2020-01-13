@@ -10,15 +10,16 @@ import (
 
 // 定义用户的struct
 type User struct{
-	Id int 			`json:"id"`
+	Id int64 			`json:"id"`
 	Name string 	`json:"name"`
 	Last_time int64 	`json:"last_time"`
+	Password string `json:"-"`
 }
 
 // 登录
 func Login(user string) (userInfo User) {
 	userInfo = User{}
-	common.MysqlDb.QueryRow("select id,name,last_time from gousers where name = ?", user).Scan(&userInfo.Id, &userInfo.Name , &userInfo.Last_time)
+	common.MysqlDb.QueryRow("select id,name,last_time,password from gousers where name = ?", user).Scan(&userInfo.Id, &userInfo.Name , &userInfo.Last_time , &userInfo.Password)
 	return
 }
 
