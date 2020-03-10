@@ -5,7 +5,7 @@
 			<ul>
 				<li><a href="/">全部</a></li>
 				{{ range .navs }}
-					<li><a href="/?cid={{ .Id }}">{{ .Name }}</a></li>
+					<li><a href="/?cid={{ .Id }}">{{ .Title }}</a></li>
 				{{ end }}
 			</ul>
 		</div>
@@ -39,7 +39,7 @@
 				type : 2 ,
 				content : '/publish' ,
 				title : '发布主题' ,
-				area : ['500px','300px']
+				area : ['500px','400px']
 			})
 		})
 	});

@@ -8,6 +8,16 @@
             </div>
         </div>
         <div class="layui-form-item">
+            <label class="layui-form-label">分类</label>
+            <div class="layui-input-block">
+                <select name="cid" class="layui-select">
+                    {{ range .category }}
+                    <option value="{{ .Id }}">{{ .Title }}</option>
+                    {{ end}}
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
             <label class="layui-form-label">内容</label>
             <div class="layui-input-block">
                 <textarea name="content" class="layui-textarea" rows="5" placeholder="请输入内容"></textarea>
