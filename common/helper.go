@@ -3,9 +3,10 @@ package common
 import (
 	"crypto/sha1"
 	"fmt"
-	"io"
-	"time"
 	"github.com/gin-gonic/gin"
+	"io"
+	"strings"
+	"time"
 )
 
 // 校验的struct
@@ -52,17 +53,23 @@ func PasswordEncode(data string) string {
 	return fmt.Sprintf("%x",t.Sum(nil))
 }
 
-func Select(condition map[interface{}]interface{}){
-	for k , v := range condition {
-		switch v.(type){
-		case string : 
-			fmt.Println("is string" , v)
-		case float64 : 
-			fmt.Println("is float64" , v)
-		case int : 
-			fmt.Println("is int" , v)
-		default : 
-			fmt.Println("unkown" , k , v)
-		}
+//如果是小写字母, 则变换为大写字母
+func StrFirstToUpper(str string) string {
+	if len(str) < 1 {
+		return ""
 	}
+	strArry := []rune(str)
+	if strArry[0] >= 97 && strArry[0] <= 122  {
+		strArry[0] -=  32
+	}
+	return string(strArry)
+}
+
+func AuthTuoFeng(item string) string {
+	items := strings.Split(item , "_")
+	for i , v := range items {
+		items[i] = StrFirstToUpper(v)
+	}
+	key := strings.Join(items , "")
+	return key
 }
