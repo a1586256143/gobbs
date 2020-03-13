@@ -1,4 +1,5 @@
 package models
+
 import (
 	"../common"
 )
@@ -7,15 +8,7 @@ type Category struct{
 	Title string
 }
 
-func GetCategory() (categorys []Category){
-	rows , _ := common.MysqlDb.Query("select id,title from category")
-	if rows != nil {
-		for rows.Next() {
-			category := Category{}
-			rows.Scan(&category.Id , &category.Title)
-			categorys = append(categorys , category)
-		}
-		return
-	}
-	return
+func GetCategory() map[int]map[string]interface{} {
+	rows := common.ORM.From(&Category{}).Select("id,title")
+	return rows
 }

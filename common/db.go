@@ -81,6 +81,47 @@ func(self *Model) Select(field string) map[int]map[string]interface{}{
 	return self.execute()
 }
 
+func (self *Model) Insert(table interface{}) (int64 , error) {
+	self.From(table)
+	t := reflect.TypeOf(table).Elem()
+	v := reflect.ValueOf(table).Elem()
+	var fields []string
+	var tmpValues []string
+	values := make([]interface{} , 0)
+	fieldNum := t.NumField()
+	for i := 0; i < fieldNum; i++ {
+		field := t.Field(i)
+		fieldName := field.Tag.Get("json")
+		if fieldName != "" {
+			fieldValue := v.Field(i)
+			fields = append(fields, fieldName)
+			var convValue interface{}
+			switch fieldValue.Type().Kind().String(){
+			case "string" :
+				convValue = fieldValue.String()
+			case "int" , "int64" :
+				convValue = fieldValue.Int()
+			case "float" , "float32" , "float64" :
+				convValue = fieldValue.Float()
+			}
+			values = append(values , &convValue)
+			tmpValues = append(tmpValues , "?")
+		}
+	}
+	joinFields := strings.Join(fields , ",")
+	joinValues := strings.Join(tmpValues , ",")
+	s := "INSERT INTO " + self.TableName + "(" + joinFields + ") VALUES (" + joinValues + ")"
+	rst , err := MysqlDb.Exec(s, values ...)
+	if err == nil {
+		rowsAffected , _ := rst.RowsAffected()
+		lastInsertID,_ := rst.LastInsertId()
+		if rowsAffected >= 1 {
+			return lastInsertID , nil
+		}
+	}
+	return 0 , nil
+}
+
 // 排序
 func(self *Model) Order(order string) *Model {
 	self.order = order
@@ -92,8 +133,14 @@ func(self *Model) Order(order string) *Model {
 	return self
 }
 
+// 执行SQL语句
 func (self *Model) execute() map[int]map[string]interface{}{
-	rows, _ := MysqlDb.Query(self.sql , self.bind... )
+	rows, err := MysqlDb.Query(self.sql , self.bind... )
+	fmt.Println("execute" , err)
+	defer func() {
+		self.clear()
+		rows.Close()
+	}()
 	if rows != nil {
 		cols , _ := rows.Columns()
 		values := make([]sql.RawBytes, len(cols))
@@ -122,4 +169,15 @@ func (self *Model) execute() map[int]map[string]interface{}{
 
 	}
 	return nil
+}
+
+// 获取SQL语句
+func (self *Model) GetSql() string {
+	return self.sql
+}
+
+// 情理
+func (self *Model) clear()  {
+	self.where , self.order = "" , ""
+	self.bind = make([]interface{} , 0)
 }
