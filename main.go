@@ -37,6 +37,15 @@ func main() {
 	// 首页
 	router.GET("/", AuthMiddleware(), handler.Index)
 
+	// 详情页面
+	router.GET("/article/:id", AuthMiddleware(), handler.DetailArticle)
+
+	// 发布页面
+	router.GET("/publish" , AuthMiddleware(), handler.PublishArticlePage)
+
+	// 发布处理
+	router.POST("/publish" , AuthMiddleware(), handler.PublishArticle)
+
 	// 登录页面
 	router.GET("/login", handler.LoginPage)
 
@@ -51,12 +60,6 @@ func main() {
 
 	// 退出登录
 	router.GET("/logout", handler.Logout)
-
-	// 发布页面
-	router.GET("/publish", handler.PublishArticlePage)
-
-	// 发布处理
-	router.POST("/publish", handler.PublishArticle)
 
 	_ = router.Run(":9999")
 }

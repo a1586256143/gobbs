@@ -65,7 +65,8 @@ func StrFirstToUpper(str string) string {
 	return string(strArry)
 }
 
-func AuthTuoFeng(item string) string {
+// 把字段名转换为驼峰名create_time转换CreateTime
+func AutoTuoFeng(item string) string {
 	items := strings.Split(item , "_")
 	for i , v := range items {
 		items[i] = StrFirstToUpper(v)

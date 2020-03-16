@@ -12,7 +12,7 @@ var ORM Model
 
 // DB接口
 type DB interface {
-	Select(condition map[interface{}]interface{} , field string) string
+	Select(field string)  map[int]map[string]interface{}
 }
 
 // Model类
@@ -26,14 +26,14 @@ type Model struct {
 }
 
 // 设置表名
-func(self *Model)From(table interface{}) *Model  {
-	self.Table = table
-	self.TableName = strings.ToLower(reflect.TypeOf(table).Elem().Name())
-	return self
+func(m *Model)From(table interface{}) *Model  {
+	m.Table = table
+	m.TableName = strings.ToLower(reflect.TypeOf(table).Elem().Name())
+	return m
 }
 
 // 解析Where条件
-func(self *Model) ParseWhere(condition map[interface{}]interface{}) string {
+func(m *Model) ParseWhere(condition map[interface{}]interface{}) string {
 	var buffer bytes.Buffer
 	buffer.Grow(len(condition))
 	var i int
@@ -57,60 +57,51 @@ func(self *Model) ParseWhere(condition map[interface{}]interface{}) string {
 		}
 		i ++
 	}
-	self.bind = value
+	m.bind = value
 	return buffer.String()
 
 }
 
-func (self *Model) Where(condition map[interface{}]interface{}) *Model  {
-	self.where = self.ParseWhere(condition)
-	return self
+// where条件
+func (m *Model) Where(condition map[interface{}]interface{}) *Model  {
+	m.where = m.ParseWhere(condition)
+	return m
 }
 
 
-// Model实现DB接口
-func(self *Model) Select(field string) map[int]map[string]interface{}{
-	execSql := "SELECT " + field + " FROM " + self.TableName
-	if self.where != "" {
-		execSql += " WHERE " + self.where
+// Model实现DB接口，查询方法
+func(m *Model) Select(field string) map[int]map[string]interface{}{
+	execSql := "SELECT " + field + " FROM " + m.TableName
+	if m.where != "" {
+		execSql += " WHERE " + m.where
 	}
-	if self.order != "" {
-		execSql += " ORDER BY " + self.order
+	if m.order != "" {
+		execSql += " ORDER BY " + m.order
 	}
-	self.sql = execSql
-	return self.execute()
+	m.sql = execSql
+	return m.execute()
 }
 
-func (self *Model) Insert(table interface{}) (int64 , error) {
-	self.From(table)
-	t := reflect.TypeOf(table).Elem()
-	v := reflect.ValueOf(table).Elem()
-	var fields []string
-	var tmpValues []string
-	values := make([]interface{} , 0)
-	fieldNum := t.NumField()
-	for i := 0; i < fieldNum; i++ {
-		field := t.Field(i)
-		fieldName := field.Tag.Get("json")
-		if fieldName != "" {
-			fieldValue := v.Field(i)
-			fields = append(fields, fieldName)
-			var convValue interface{}
-			switch fieldValue.Type().Kind().String(){
-			case "string" :
-				convValue = fieldValue.String()
-			case "int" , "int64" :
-				convValue = fieldValue.Int()
-			case "float" , "float32" , "float64" :
-				convValue = fieldValue.Float()
-			}
-			values = append(values , &convValue)
-			tmpValues = append(tmpValues , "?")
-		}
+// Model实现DB接口，查询方法
+func(m *Model) Find(field string) map[string]interface{}{
+	execSql := "SELECT " + field + " FROM " + m.TableName
+	if m.where != "" {
+		execSql += " WHERE " + m.where
 	}
-	joinFields := strings.Join(fields , ",")
-	joinValues := strings.Join(tmpValues , ",")
-	s := "INSERT INTO " + self.TableName + "(" + joinFields + ") VALUES (" + joinValues + ")"
+	m.sql = execSql
+	data := m.execute()
+	return data[0]
+}
+
+/**
+ * 插入操作
+ * common.ORM.Insert(Article{Id:1,Title:111})
+ * 返回插入的ID
+ */
+func (m *Model) Insert(table interface{}) (int64 , error) {
+	m.From(table)
+	joinFields , joinValues , values := GetModelInfo(table)
+	s := "INSERT INTO " + m.TableName + "(" + joinFields + ") VALUES (" + joinValues + ")"
 	rst , err := MysqlDb.Exec(s, values ...)
 	if err == nil {
 		rowsAffected , _ := rst.RowsAffected()
@@ -123,25 +114,24 @@ func (self *Model) Insert(table interface{}) (int64 , error) {
 }
 
 // 排序
-func(self *Model) Order(order string) *Model {
-	self.order = order
+func(m *Model) Order(order string) *Model {
+	m.order = order
 	split := strings.Split(order , " ")
 	if len(split) == 1 {
 		split = append(split, "DESC")
 	}
-	self.order = strings.Join(split , " ")
-	return self
+	m.order = strings.Join(split , " ")
+	return m
 }
 
 // 执行SQL语句
-func (self *Model) execute() map[int]map[string]interface{}{
-	rows, err := MysqlDb.Query(self.sql , self.bind... )
-	fmt.Println("execute" , err)
+func (m *Model) execute() map[int]map[string]interface{}{
+	rows, err := MysqlDb.Query(m.sql , m.bind... )
 	defer func() {
-		self.clear()
+		m.clear()
 		rows.Close()
 	}()
-	if rows != nil {
+	if rows != nil && err == nil {
 		cols , _ := rows.Columns()
 		values := make([]sql.RawBytes, len(cols))
 		scans := make([]interface{}, len(cols))
@@ -158,8 +148,8 @@ func (self *Model) execute() map[int]map[string]interface{}{
 			}
 			row := make(map[string]interface{})
 
-			for j , value := range values { //注意：此处用vals
-				key := AuthTuoFeng(cols[j])
+			for j , value := range values { //注意：此处用values
+				key := AutoTuoFeng(cols[j])
 				row[key] = string(value)
 			}
 			results[i] = row
@@ -167,17 +157,19 @@ func (self *Model) execute() map[int]map[string]interface{}{
 		}
 		return results
 
+	}else {
+		fmt.Println("execute error : " , err)
 	}
 	return nil
 }
 
 // 获取SQL语句
-func (self *Model) GetSql() string {
-	return self.sql
+func (m *Model) GetSql() string {
+	return m.sql
 }
 
 // 情理
-func (self *Model) clear()  {
-	self.where , self.order = "" , ""
-	self.bind = make([]interface{} , 0)
+func (m *Model) clear()  {
+	m.where , m.order = "" , ""
+	m.bind = make([]interface{} , 0)
 }

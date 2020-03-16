@@ -42,3 +42,19 @@ func PublishArticlePage(c *gin.Context) {
 		"category": models.GetCategory(),
 	})
 }
+
+func DetailArticle(c *gin.Context){
+	id := c.Param("id")
+	condition := map[interface{}]interface{}{
+		"id":id ,
+	}
+	find := common.ORM.From(&models.Article{}).Where(condition).Find("id,uid,title,content,create_time")
+	if find["CreateTime"] != "0" {
+		times , _ := strconv.ParseInt(find["CreateTime"].(string) , 10 , 64)
+		find["FormatTime"] = common.DateFormat(times)
+	}
+	find["NickName"] = models.GetUserName(find["Uid"].(string))
+	c.HTML(http.StatusOK , "detail.html" , gin.H{
+		"find" : find,
+	})
+}

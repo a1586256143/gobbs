@@ -1,0 +1,29 @@
+{{ template "header" . }}
+<div class="layui-container layui-row">
+    <div class="layui-breadcrumb">
+        <a href="/">首页</a>
+        <a><cite>正文</cite></a>
+    </div>
+    <div class="layui-card" style="margin-top: 1.5rem;">
+        <div class="layui-card-header"><strong>{{ .find.Title }}</strong></div>
+        <div class="layui-card-body">
+            发布人：{{ .find.NickName }} 发布时间：{{ .find.FormatTime }} <br> <br>
+            {{ .find.Content }} <br><br>
+            <a href="javascript:history.back();" class="layui-btn layui-btn-warm">返回</a>
+        </div>
+    </div>
+</div>
+{{ template "footer" . }}
+<script>
+    //Demo
+    layui.use('form', function(){
+        $('.publish').click(function(){
+            layer.open({
+                type : 2 ,
+                content : '/publish' ,
+                title : '发布主题' ,
+                area : ['500px','400px']
+            })
+        })
+    });
+</script>
