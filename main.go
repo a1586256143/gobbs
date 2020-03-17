@@ -23,7 +23,6 @@ func AuthMiddleware() gin.HandlerFunc {
 		return
 	}
 }
-
 func main() {
 	router := gin.Default()
 	// 加载HTML模板
@@ -46,6 +45,9 @@ func main() {
 	// 发布处理
 	router.POST("/publish" , AuthMiddleware(), handler.PublishArticle)
 
+	// 发布评论
+	router.POST("/comments" , AuthMiddleware() , handler.PublishComment)
+
 	// 登录页面
 	router.GET("/login", handler.LoginPage)
 
@@ -60,6 +62,9 @@ func main() {
 
 	// 退出登录
 	router.GET("/logout", handler.Logout)
+
+	// 获取验证码
+	router.GET("/captcha/:captchaId" , handler.Captcha)
 
 	_ = router.Run(":9999")
 }

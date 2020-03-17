@@ -4,7 +4,6 @@ import (
 	"../common"
 	"../models"
 	"github.com/gin-gonic/gin"
-	"strconv"
 )
 
 func Index(c *gin.Context) {
@@ -23,15 +22,7 @@ func Index(c *gin.Context) {
 	if condition["cid"] == "0" {
 		delete(condition , "cid")
 	}
-	articles := common.ORM.From(&models.Article{}).Order("create_time").Where(condition).Select("id,title,create_time")
-	if len(articles) > 0 {
-		for _ , v := range articles{
-			if v["CreateTime"] != "0" {
-				times , _ := strconv.ParseInt(v["CreateTime"].(string) , 10 , 64)
-				v["FormatTime"] = common.DateFormat(times)
-			}
-		}
-	}
+	articles := models.GetAllArticle(condition)
 
 	c.HTML(200, "index.html", gin.H{
 		"userInfo":  userInfo,
@@ -39,4 +30,8 @@ func Index(c *gin.Context) {
 		"navs":      models.GetCategory(),
 		"list":      articles,
 	})
+}
+
+func Captcha(c *gin.Context)  {
+	common.ServeHTTP(c.Writer , c.Request)
 }

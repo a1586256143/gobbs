@@ -93,6 +93,12 @@ func(m *Model) Find(field string) map[string]interface{}{
 	return data[0]
 }
 
+// 统计条数
+func (m *Model) Count(field string) string {
+	data := m.Find("count(" + field + ") as count_field")
+	return data["CountField"].(string)
+}
+
 /**
  * 插入操作
  * common.ORM.Insert(Article{Id:1,Title:111})

@@ -26,16 +26,10 @@ func PublishArticle(c *gin.Context) {
 	uid := models.GetUserInfo(cookie).Id
 	status := models.AddArticle(uid, title, content, cid)
 	if status == 0 {
-		c.JSON(200, gin.H{
-			"status": 1,
-			"msg":    "发布失败，请重新尝试",
-		})
+		c.JSON(200, common.Error("发布失败，请重新尝试"))
 		return
 	}
-	c.JSON(200, gin.H{
-		"status": 0,
-		"msg":    "发布成功",
-	})
+	c.JSON(200, common.Success("发布成功"))
 }
 func PublishArticlePage(c *gin.Context) {
 	c.HTML(http.StatusOK, "publish.html", gin.H{
@@ -54,7 +48,19 @@ func DetailArticle(c *gin.Context){
 		find["FormatTime"] = common.DateFormat(times)
 	}
 	find["NickName"] = models.GetUserName(find["Uid"].(string))
+	captchaId := common.GetCaptchaId()
+	// 查询评论
+	commentMaps := map[interface{}]interface{}{
+		"aid" : find["Id"],
+		"status":0 ,
+	}
+	comments := models.GetAllComments(commentMaps)
+	commentCount := common.ORM.From(&models.Comments{}).Where(commentMaps).Count("id")
 	c.HTML(http.StatusOK , "detail.html" , gin.H{
 		"find" : find,
+		"ImageUrl":"/captcha/" + captchaId + ".png",
+		"captchaId":captchaId ,
+		"comments":comments,
+		"commentsCount" : commentCount,
 	})
 }

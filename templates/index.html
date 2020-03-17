@@ -1,7 +1,7 @@
 {{ template "header" . }}
 	<div class="layui-container index">
 		<div class="navs">
-			<button class="layui-btn publish">发布主题</button>
+			<button class="layui-btn publish">发表主题</button>
 			<ul>
 				<li><a href="/">全部</a></li>
 				{{ range .navs }}
@@ -40,7 +40,7 @@
 			layer.open({
 				type : 2 ,
 				content : '/publish' ,
-				title : '发布主题' ,
+				title : '发表主题' ,
 				area : ['500px','400px']
 			})
 		})

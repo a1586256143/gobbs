@@ -12,18 +12,64 @@
             <a href="javascript:history.back();" class="layui-btn layui-btn-warm">返回</a>
         </div>
     </div>
+    <div class="layui-card">
+        <div class="layui-card-header">
+            评论列表({{ .commentsCount }})
+        </div>
+        <div class="layui-card-body">
+            {{ range .comments }}
+                <p>{{ .Content }}</p>
+                <hr>
+            {{ end }}
+        </div>
+    </div>
+
+    <div class="layui-card">
+        <div class="layui-card-header">
+            发表评论
+        </div>
+        <div class="layui-card-body">
+            <form action="" class="layui-form">
+                <div class="layui-form-item">
+                    <textarea name="content" lay-verify="required" class="layui-textarea" rows="5" placeholder="说点什么吧..."></textarea>
+                </div>
+                <div class="layui-form-item">
+                    <img class="captcha" src="{{ .ImageUrl }}" alt="" style="width: 100px;display: inline-block;">
+                    <input type="text"lay-verify="number" class="layui-input" name="captcha" style="display: inline-block;width: 100px;" placeholder="验证码..."/>
+                </div>
+                <div class="layui-form-item">
+                    <button lay-submit lay-filter="submit" class="layui-btn">发表</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {{ template "footer" . }}
 <script>
     //Demo
     layui.use('form', function(){
-        $('.publish').click(function(){
-            layer.open({
-                type : 2 ,
-                content : '/publish' ,
-                title : '发布主题' ,
-                area : ['500px','400px']
-            })
+        $('.captcha').click(function(){
+            var url = "{{ .ImageUrl }}"
+            $(this).attr("src" , url + "?reload=" + (new Date()).getTime())
         })
+
+        var form = layui.form;
+
+        //监听提交
+        form.on('submit(submit)', function(data){
+            data.field.captchaId = "{{ .captchaId }}"
+            data.field.aid = "{{ .find.Id }}"
+            $.post('/comments' , data.field , (data) => {
+                if (data.status) {
+                    layer.msg(data.msg)
+                    return;
+                }
+                layer.msg(data.msg)
+                setTimeout(() => {
+                    window.location.reload();
+                } , 1500);
+            } , 'json');
+            return false;
+        });
     });
 </script>

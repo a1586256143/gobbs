@@ -57,3 +57,14 @@ CREATE TABLE `gousers` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+DROP TABLE IF EXISTS `comments`;
+CREATE TABLE `comments` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `uid` int(11) unsigned DEFAULT '0',
+  `aid` int(11) unsigned DEFAULT '0',
+  `content` text COLLATE utf8mb4_general_ci,
+  `create_time` int(10) unsigned DEFAULT '0',
+  `status` tinyint(1) unsigned DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

@@ -15,6 +15,7 @@ type Validate struct{
 	Msg string
 }
 
+
 /**
  * 验证助手
  * @param {[type]} c        gin.Context [description]
@@ -24,10 +25,7 @@ func ValidateHelper(c gin.Context , validate []Validate) (success bool) {
 	success = true
 	for _ , v := range validate {
 		if c.PostForm(v.Field) == "" && success == true {
-			c.JSON(200 , gin.H{
-				"status" : 1 ,
-				"msg" : v.Msg ,
-			})
+			c.JSON(200 , Error(v.Msg))
 			success = false
 			break
 		}
