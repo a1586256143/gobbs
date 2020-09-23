@@ -1,7 +1,7 @@
 package models
 
 import (
-	"../common"
+	"gobbs/common"
 	"strconv"
 )
 

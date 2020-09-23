@@ -1,9 +1,9 @@
 package main
 
 import (
-	"./common"
-	"./models"
-	handler "./router"
+	"gobbs/common"
+	"gobbs/models"
+	handler "gobbs/router"
 	"github.com/gin-gonic/gin"
 	"html/template"
 )

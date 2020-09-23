@@ -1,7 +1,7 @@
 package models
 
 import (
-	"../common"
+	"gobbs/common"
 	"encoding/base64"
 	"encoding/json"
 	"github.com/gin-gonic/gin"

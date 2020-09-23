@@ -1,10 +1,10 @@
 package router
 
 import (
-	"../common"
+	"gobbs/common"
 	"github.com/gin-gonic/gin"
 	"log"
-	"../models"
+	"gobbs/models"
 	"strconv"
 )
 

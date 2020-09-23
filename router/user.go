@@ -1,8 +1,8 @@
 package router
 
 import (
-	"../common"
-	"../models"
+	"gobbs/common"
+	"gobbs/models"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
