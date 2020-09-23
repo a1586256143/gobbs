@@ -15,7 +15,7 @@ const (
 	PASS_WORD = "123456"
 	HOST = "localhost"
 	PORT = "3306"
-	DATABASE = "test"
+	DATABASE = "testdb"
 	CHARSET = "utf8"
 )
 

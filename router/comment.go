@@ -21,7 +21,7 @@ func PublishComment(c *gin.Context) {
 	cookie, _ := c.Cookie("user")
 	uid := models.GetUserInfo(cookie).Id
 	aid , _ := strconv.Atoi(c.PostForm("aid"))
-	if models.AddComments(int(uid), aid , content , 0) == true {
+	if models.AddComments(int(uid), aid , content , 1) == true {
 		c.JSON(200 , common.Success("发布成功"))
 		return
 	}

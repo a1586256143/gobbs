@@ -7,6 +7,7 @@ import (
 	"io"
 	"strings"
 	"time"
+	"strconv"
 )
 
 // 校验的struct
@@ -71,4 +72,10 @@ func AutoTuoFeng(item string) string {
 	}
 	key := strings.Join(items , "")
 	return key
+}
+
+// 格式化时间
+func FormatTime(time string) string {
+	times , _ := strconv.ParseInt(time , 10 , 64)
+	return DateFormat(times)
 }

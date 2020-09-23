@@ -24,6 +24,6 @@ func AddComments(uid , aid int , content string , status int) bool {
 
 // 获取指定条件的所有评论
 func GetAllComments(commentMaps map[interface{}]interface{}) map[int]map[string]interface{} {
-	comments := common.ORM.From(&Comments{}).Where(commentMaps).Order("create_time").Select("content,id")
+	comments := common.ORM.From(&Comments{}).Where(commentMaps).Order("create_time").Select("content,id,create_time")
 	return comments
 }

@@ -38,3 +38,32 @@ body{
 	border-top-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 }
+.comment-list span{
+	display: inline-block;
+	float: right;
+}
+.comment-list .user-box{
+	border-bottom: 1px solid #efefef;
+	margin-top: 10px;
+}
+.comment-list .user-box:last-child{
+	border:0px;
+}
+.comment-list .user-box img{
+	border-radius:50%;
+	width:45px;
+	height:45px;
+}
+.comment-list .user-head{
+	margin-right: 10px;
+	display: flex;
+}
+.comment-list .user-head .user-avatar{
+	margin-right: 10px;
+}
+.comment-list .user-head .user-info p:first-child{
+	font-size: 100%;
+}
+.comment-list .user-content{
+	margin:10px 0;
+}

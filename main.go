@@ -66,5 +66,8 @@ func main() {
 	// 获取验证码
 	router.GET("/captcha/:captchaId" , handler.Captcha)
 
+	// 重载验证码
+	router.GET("/captchaReload" , handler.ReloadCaptcha)
+
 	_ = router.Run(":9999")
 }

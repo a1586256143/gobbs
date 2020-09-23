@@ -16,10 +16,22 @@
         <div class="layui-card-header">
             评论列表({{ .commentsCount }})
         </div>
-        <div class="layui-card-body">
+        <div class="layui-card-body comment-list">
             {{ range .comments }}
-                <p>{{ .Content }}</p>
-                <hr>
+                <div class="user-box">
+                    <div class="user-head">
+                        <div class="user-avatar">
+                            <img src="http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
+                        </div>
+                        <div class="user-info">
+                            <p>张三</p>
+                            <p>{{ .FormatTime }}</p>
+                        </div>
+                    </div>
+                    <div class="user-content">
+                        {{ .Content }}
+                    </div>
+                </div>
             {{ end }}
         </div>
     </div>
@@ -48,16 +60,21 @@
 <script>
     //Demo
     layui.use('form', function(){
+        let captchaId = '{{ .captchaId }}';
         $('.captcha').click(function(){
             var url = "{{ .ImageUrl }}"
-            $(this).attr("src" , url + "?reload=" + (new Date()).getTime())
+            $.get('/captchaReload' , (data) => {
+                $(this).attr("src" , data.ImageUrl)
+                captchaId = data.captchaId;
+            } , 'json');
+            // $(this).attr("src" , url + "?reload=" + (new Date()).getTime())
         })
 
         var form = layui.form;
 
         //监听提交
         form.on('submit(submit)', function(data){
-            data.field.captchaId = "{{ .captchaId }}"
+            data.field.captchaId = captchaId;
             data.field.aid = "{{ .find.Id }}"
             $.post('/comments' , data.field , (data) => {
                 if (data.status) {

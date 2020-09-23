@@ -37,6 +37,18 @@ func PublishArticlePage(c *gin.Context) {
 	})
 }
 
+/**
+ * 刷新验证码
+ * @param {[type]} c *gin.Context [description]
+ */
+func ReloadCaptcha(c *gin.Context){
+	captchaId := common.GetCaptchaId()
+	c.JSON(http.StatusOK , gin.H{
+		"ImageUrl":"/captcha/" + captchaId + ".png",
+		"captchaId":captchaId ,
+	})
+}
+
 func DetailArticle(c *gin.Context){
 	id := c.Param("id")
 	condition := map[interface{}]interface{}{
@@ -44,17 +56,21 @@ func DetailArticle(c *gin.Context){
 	}
 	find := common.ORM.From(&models.Article{}).Where(condition).Find("id,uid,title,content,create_time")
 	if find["CreateTime"] != "0" {
-		times , _ := strconv.ParseInt(find["CreateTime"].(string) , 10 , 64)
-		find["FormatTime"] = common.DateFormat(times)
+		find["FormatTime"] = common.FormatTime(find["CreateTime"].(string))
 	}
 	find["NickName"] = models.GetUserName(find["Uid"].(string))
 	captchaId := common.GetCaptchaId()
 	// 查询评论
 	commentMaps := map[interface{}]interface{}{
 		"aid" : find["Id"],
-		"status":0 ,
+		"status":1 ,
 	}
 	comments := models.GetAllComments(commentMaps)
+	for _ , v := range comments {
+		if v["CreateTime"] != "0" {
+			v["FormatTime"] = common.FormatTime(v["CreateTime"].(string));
+		}
+	}
 	commentCount := common.ORM.From(&models.Comments{}).Where(commentMaps).Count("id")
 	c.HTML(http.StatusOK , "detail.html" , gin.H{
 		"find" : find,

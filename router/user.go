@@ -29,13 +29,15 @@ func Login(c *gin.Context) {
 
 func Register(c *gin.Context) {
 	user := c.PostForm("name")
+	password := c.PostForm("password")
+	telephone := c.PostForm("telephone")
 	userInfo := models.Login(user)
 	if userInfo.Name != "" {
 		// 说明账号已经被注册了
 		c.JSON(200, common.Error("账号已被注册"))
 	} else {
 		t := common.GetUnix()
-		ret, _ := common.MysqlDb.Exec("insert into gousers(name,telephone,create_time,last_time) values (?,?)", user, "123456", t, t)
+		ret, _ := common.MysqlDb.Exec("insert into gousers(name,password,telephone,create_time,last_time) values (?,?,?,?,?)", user , common.PasswordEncode(password), telephone, t, t)
 		rowsAffected, _ := ret.RowsAffected()
 		lastInsertID, _ := ret.LastInsertId()
 		if rowsAffected > 0 {
