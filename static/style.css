@@ -11,6 +11,9 @@ body{
 	width: 25%;
 	margin-right: 5%;
 }
+.nav-container{
+	background: #393D49;
+}
 .list .layui-row{
 	margin-bottom: 1rem;
 	background: white;
@@ -66,4 +69,105 @@ body{
 }
 .comment-list .user-content{
 	margin:10px 0;
+}
+.space-box{
+	/*border:1px solid #ccc;*/
+	border-radius: 5px;
+	margin-bottom:10px;
+}
+.space-title{
+	font-size: 15px;
+	font-weight: bold;
+	background: #009688;
+	color: white;
+	padding:10px 15px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+.space-info{
+	padding: 10px;
+	background: white;
+}
+.space-avatar{
+	/*border-radius: 50%;*/
+}
+.space-avatar img{
+	border-radius: 50%;
+	margin:0 auto;
+	width: 100px;
+	height: 100px;
+	display: block;
+}
+.space-userinfo{
+	text-align: left;
+}
+.space-userinfo p{
+	padding-top: 10px;
+}
+.space-userinfo p:first-child{
+	text-align: center;
+	font-size: 15px;
+}
+.stat-item p:first-child{
+	padding:0px;
+}
+.stat-item p{
+	padding-top: 5px;
+}
+.space-left{
+	width:250px;
+}
+.space-right{
+	margin-left: 15px;
+	width: calc(100% - 265px);
+}
+.space-right .list{
+	width: 100%;
+}
+.space-right .space-info .list .layui-row:first-child{
+	margin-top: 10px;
+}
+.space-right .space-info .list .layui-row{
+	background: none;
+	padding: 0px;
+	padding-bottom: 10px;
+	border-bottom:1px solid #eee;
+}
+.space-right .space-info .list .layui-row a::after{
+	content: "";
+	clear: both;
+}
+.login-left{
+	width: calc(100% - 360px);
+	margin-right: 20px;
+	background: #ccc;
+}
+.login-left::after{
+	content: "";
+}
+.login-right{
+	width: 380px;
+}
+.login-right .layui-input-block{
+	width: 230px;
+	margin-left: 80px;
+}
+.login-right .layui-form-label{
+	width: 50px;
+}
+.login{
+	display: flex;
+}
+.user-nav{
+	margin-top: 20px;
+}
+.user-nav-item{
+	padding: 10px;
+	border-bottom: 1px solid #eee;
+}
+.user-nav-item:last-child,.space-right .space-info .list .layui-row:last-child{
+	border-bottom: 0px;
+}
+.flex{
+	display: flex;
 }

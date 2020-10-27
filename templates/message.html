@@ -1,0 +1,61 @@
+{{ template "header" . }}
+	<div class="layui-container index">
+		<div class="space-left">
+			{{ template "user-nav-left" . }}
+		</div>
+		<div class="space-right">
+			<!-- 个人信息 -->
+			<div class="space-box space-userinfo">
+				<div class="space-title">
+					我的消息
+				</div>
+				<div class="space-info">
+					<div class="list">
+						{{ if .list }}
+							{{ range .list }}
+							<div class="layui-row">
+								<div class="layui-col-md9">
+									<a href="/space/{{ .Uid }}">
+										<img style="width:25px;border-radius: 50%;margin-right: 7px;" src="http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
+									</a>
+									{{ .NickName }}请求添加你为好友。附加信息：{{ .Remark }}
+								</div>
+								<div class="layui-col-md3">
+									<span class="accept layui-btn layui-btn-success layui-btn-sm" data-id="{{ .Id }}" data-status="1">同意</span>
+									<span class="accept layui-btn layui-btn-danger layui-btn-sm" data-status="2">拒绝</span>
+								</div>
+							</div>
+							{{ end }}
+						{{ else }}
+							<div class="layui-row">
+								<div class="layui-col-md12" style="text-align:left">
+									暂时没有信息
+								</div>
+							</div>
+						{{ end }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{{ template "footer" . }}
+<script>
+	//Demo
+	layui.use('form', function(){
+		$('.accept').click(function(){
+			let id = $(this).attr('data-id') , status = $(this).attr('data-status')
+			if (id && status) {
+				$.post('/accept' , {id : id , status : status} , function(data){
+					if (data.status) {
+                        layer.msg(data.msg)
+                        return;
+                    }
+                    layer.msg(data.msg);
+                    setTimeout(function(){
+                    	window.location.reload();
+                    } , 1500)
+				})
+			}
+		})
+	});
+</script>

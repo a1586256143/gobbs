@@ -1,0 +1,45 @@
+{{ template "header" . }}
+	<div class="layui-container index">
+		<div class="space-left">
+			{{ template "user-nav-left" . }}
+		</div>
+		<div class="space-right">
+			<!-- 个人信息 -->
+			<div class="space-box space-userinfo">
+				<div class="space-title">
+					我的发布
+				</div>
+				<div class="space-info">
+					<div class="list">
+						{{ if .list }}
+							{{ range .list }}
+							<div class="layui-row">
+								<a href="/article/{{ .Id }}">
+									<div class="layui-col-md9">
+										{{ .Title }}
+									</div>
+									<div class="layui-col-md3">
+										{{ .FormatTime }}
+									</div>
+								</a>
+							</div>
+							{{ end }}
+						{{ else }}
+							<div class="layui-row">
+								<div class="layui-col-md12" style="text-align:left">
+									暂时没有信息
+								</div>
+							</div>
+						{{ end }}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{{ template "footer" . }}
+<script>
+	//Demo
+	layui.use('form', function(){
+		
+	});
+</script>

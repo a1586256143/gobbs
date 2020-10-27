@@ -17,10 +17,11 @@
                 </select>
             </div>
         </div>
+
         <div class="layui-form-item">
             <label class="layui-form-label">内容</label>
             <div class="layui-input-block">
-                <textarea name="content" class="layui-textarea" rows="5" placeholder="请输入内容"></textarea>
+                <textarea name="content" id="content" class="layui-textarea" rows="5" placeholder="请输入内容"></textarea>
             </div>
         </div>
         <div class="layui-form-item">
@@ -34,11 +35,18 @@
 {{ template "footer" . }}
 <script>
     //Demo
-    layui.use('form', function(){
+    layui.use(['form','layedit'], function(){
         var form = layui.form;
-
+        var layedit = layui.layedit;
+        layedit.set({
+            uploadImage: {
+                url: '/upload' //接口url
+            }
+        });
+        let index = layedit.build('content'); //建立编辑器
         //监听提交
         form.on('submit(submit)', function(data){
+            data.field.content = layedit.getContent(index);
             $.post('/publish' , data.field , (data) => {
                 if (data.status) {
                     layer.msg(data.msg)

@@ -4,8 +4,9 @@ import (
 	"gobbs/common"
 	"gobbs/models"
 	handler "gobbs/router"
-	"github.com/gin-gonic/gin"
 	"html/template"
+
+	"github.com/gin-gonic/gin"
 )
 
 // 中间件
@@ -25,28 +26,30 @@ func AuthMiddleware() gin.HandlerFunc {
 }
 func main() {
 	router := gin.Default()
-	// 加载HTML模板
-	router.LoadHTMLGlob("templates/*")
 	// 引入静态文件
 	router.Static("/static", "./static")
+	router.Static("/upload", "./upload")
 	// 注入模板函数
 	router.SetFuncMap(template.FuncMap{
 		"dateFormat": common.DateFormat,
+		"str2html":   common.Str2html,
 	})
+	// 加载HTML模板
+	router.LoadHTMLGlob("templates/*")
 	// 首页
 	router.GET("/", AuthMiddleware(), handler.Index)
 
 	// 详情页面
-	router.GET("/article/:id", AuthMiddleware(), handler.DetailArticle)
+	router.GET("/article/:id", handler.DetailArticle)
 
 	// 发布页面
-	router.GET("/publish" , AuthMiddleware(), handler.PublishArticlePage)
+	router.GET("/publish", AuthMiddleware(), handler.PublishArticlePage)
 
 	// 发布处理
-	router.POST("/publish" , AuthMiddleware(), handler.PublishArticle)
+	router.POST("/publish", AuthMiddleware(), handler.PublishArticle)
 
 	// 发布评论
-	router.POST("/comments" , AuthMiddleware() , handler.PublishComment)
+	router.POST("/comments", AuthMiddleware(), handler.PublishComment)
 
 	// 登录页面
 	router.GET("/login", handler.LoginPage)
@@ -64,10 +67,30 @@ func main() {
 	router.GET("/logout", handler.Logout)
 
 	// 获取验证码
-	router.GET("/captcha/:captchaId" , handler.Captcha)
+	router.GET("/captcha/:captchaId", handler.Captcha)
 
 	// 重载验证码
-	router.GET("/captchaReload" , handler.ReloadCaptcha)
+	router.GET("/captchaReload", handler.ReloadCaptcha)
 
+	// 上传图片
+	router.POST("/upload", AuthMiddleware(), handler.UploadImg)
+
+	// 个人空间
+	router.GET("/space", handler.SpacePage)
+
+	// 其它用户的空间
+	router.GET("/space/:uid", handler.SpacePage)
+
+	// 加好友
+	router.POST("/add-friends/:uid", AuthMiddleware(), handler.AddFriends)
+
+	// 我的消息
+	router.GET("/message", AuthMiddleware(), handler.Message)
+
+	// 同意或拒绝请求
+	router.POST("/accept", AuthMiddleware(), handler.Accept)
+
+	// 我的好友
+	router.GET("/friends", AuthMiddleware(), handler.Friends)
 	_ = router.Run(":9999")
 }

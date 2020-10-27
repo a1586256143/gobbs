@@ -4,55 +4,93 @@
         <a href="/">首页</a>
         <a><cite>正文</cite></a>
     </div>
-    <div class="layui-card" style="margin-top: 1.5rem;">
-        <div class="layui-card-header"><strong>{{ .find.Title }}</strong></div>
-        <div class="layui-card-body">
-            发布人：{{ .find.NickName }} 发布时间：{{ .find.FormatTime }} <br> <br>
-            {{ .find.Content }} <br><br>
-            <a href="javascript:history.back();" class="layui-btn layui-btn-warm">返回</a>
-        </div>
-    </div>
-    <div class="layui-card">
-        <div class="layui-card-header">
-            评论列表({{ .commentsCount }})
-        </div>
-        <div class="layui-card-body comment-list">
-            {{ range .comments }}
-                <div class="user-box">
-                    <div class="user-head">
-                        <div class="user-avatar">
-                            <img src="http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
-                        </div>
-                        <div class="user-info">
-                            <p>张三</p>
-                            <p>{{ .FormatTime }}</p>
-                        </div>
-                    </div>
-                    <div class="user-content">
-                        {{ .Content }}
-                    </div>
+    <div class="content flex" style="margin-top: .8rem;">
+        <div class="left" style="width: 80%;">
+            <div class="layui-card">
+                <div class="layui-card-header"><strong>{{ .find.Title }}</strong></div>
+                <div class="layui-card-body">
+                    发布人：<a href="/space/{{ .find.Uid }}">{{ .find.NickName }}</a> 发布时间：{{ .find.FormatTime }} <br> <br>
+                    {{ .find.Content }} <br><br>
+                    <a href="javascript:history.back();" class="layui-btn layui-btn-warm">返回</a>
                 </div>
-            {{ end }}
-        </div>
-    </div>
+            </div>
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    评论列表({{ .commentsCount }})
+                </div>
+                <div class="layui-card-body comment-list">
+                    {{ if not .comments }}
+                        <p>快来抢沙发了~</p>
+                    {{ end }}
+                    {{ range .comments }}
+                        <div class="user-box">
+                            <div class="user-head">
+                                <div class="user-avatar">
+                                    <img src="http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
+                                </div>
+                                <div class="user-info">
+                                    <p>张三</p>
+                                    <p>{{ .FormatTime }}</p>
+                                </div>
+                            </div>
+                            <div class="user-content">
+                                {{ .Content | str2html }}
+                            </div>
+                        </div>
+                    {{ end }}
+                </div>
+            </div>
 
-    <div class="layui-card">
-        <div class="layui-card-header">
-            发表评论
+            <div class="layui-card">
+                <div class="layui-card-header">
+                    发表评论
+                </div>
+                <div class="layui-card-body">
+                    {{ if .login }}
+                    <form action="" class="layui-form">
+                        <div class="layui-form-item">
+                            <textarea name="content" lay-verify="required" class="layui-textarea" rows="5" placeholder="说点什么吧..."></textarea>
+                        </div>
+                        <div class="layui-form-item">
+                            <img class="captcha" src="{{ .ImageUrl }}" alt="" style="width: 100px;display: inline-block;">
+                            <input type="text"lay-verify="number" class="layui-input" name="captcha" style="display: inline-block;width: 100px;" placeholder="验证码..."/>
+                        </div>
+                        <div class="layui-form-item">
+                            <button lay-submit lay-filter="submit" class="layui-btn">发表</button>
+                        </div>
+                    </form>
+                    {{ else }}
+                        登录后才能评论，去<a href="/login">登录</a>
+                    {{ end }}
+                </div>
+            </div>
         </div>
-        <div class="layui-card-body">
-            <form action="" class="layui-form">
-                <div class="layui-form-item">
-                    <textarea name="content" lay-verify="required" class="layui-textarea" rows="5" placeholder="说点什么吧..."></textarea>
+        <div class="right" style="width: 23%;margin-left: 2%;">
+                <div class="space-info">
+                    <div class="space-avatar">
+                        <img src="http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
+                    </div>
+                    <div class="space-userinfo">
+                        <p>{{ .find.NickName }}</p>
+                        <!-- 不是朋友，并且不是自己发布的 -->
+                        {{ if not .isFriend }}
+                            {{ if ne .userInfo.Id .find.Uid }}
+                            <p style="text-align: center;">
+                                <span class="add-friends layui-btn layui-btn-normal layui-btn-sm" data-id="{{ .find.Uid }}">
+                                    <i class="layui-icon layui-icon-addition"></i>加好友
+                                </span>
+                            </p>
+                            {{ end }}
+                        {{ else }}
+                            <p style="text-align: center;">
+                                <span class="add-friends layui-btn layui-btn-normal layui-btn-sm" data-id="{{ .find.Uid }}">
+                                    <i class="layui-icon layui-icon-reply-fill"></i>聊天
+                                </span>
+                            </p>
+                        {{ end }}
+                    </div>
                 </div>
-                <div class="layui-form-item">
-                    <img class="captcha" src="{{ .ImageUrl }}" alt="" style="width: 100px;display: inline-block;">
-                    <input type="text"lay-verify="number" class="layui-input" name="captcha" style="display: inline-block;width: 100px;" placeholder="验证码..."/>
-                </div>
-                <div class="layui-form-item">
-                    <button lay-submit lay-filter="submit" class="layui-btn">发表</button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
@@ -67,17 +105,41 @@
                 $(this).attr("src" , data.ImageUrl)
                 captchaId = data.captchaId;
             } , 'json');
-            // $(this).attr("src" , url + "?reload=" + (new Date()).getTime())
         })
 
         var form = layui.form;
-
+        $('.add-friends').click(function(){
+            let uid = $(this).attr('data-id');
+            if (!uid) {
+                return
+            }
+            //例子2
+            layer.prompt({
+                formType: 2,
+                value: '你好，我是{{ .userInfo.Name}}',
+                title: '添加好友',
+                area: ['300px', '50px'] //自定义文本域宽高
+            }, function(value, index, elem){
+                $.post('/add-friends/' + uid , {content : value} , function(data){
+                    if (data.status) {
+                        layer.msg(data.msg)
+                        return;
+                    }
+                    layer.close(index);
+                    layer.msg(data.msg);
+                })
+            });
+        })
         //监听提交
         form.on('submit(submit)', function(data){
             data.field.captchaId = captchaId;
             data.field.aid = "{{ .find.Id }}"
             $.post('/comments' , data.field , (data) => {
                 if (data.status) {
+                    if(data.msg == 'validImg'){
+                        $('.captcha').click();
+                        data.msg = '验证码错误';
+                    }
                     layer.msg(data.msg)
                     return;
                 }

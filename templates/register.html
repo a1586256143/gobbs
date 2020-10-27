@@ -1,36 +1,41 @@
 {{ template "header" . }}
-	<div class="layui-container">
-	<div class="layui-card">
-		<div class="layui-card-header">用户注册</div>
-		<div class="layui-card-body">
-			<form method="post" action="/register" class="layui-form">
-				<div class="layui-form-item">
-					<label class="layui-form-label">账号</label>
-					<div class="layui-input-block">
-						<input type="text" name="name" required  lay-verify="required" placeholder="请输入账号" autocomplete="off" class="layui-input">
-					</div>
-				</div>
-				<div class="layui-form-item">
-					<label class="layui-form-label">密码</label>
-					<div class="layui-input-block">
-						<input type="password" name="password" required  lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
-					</div>
-				</div>
-				<div class="layui-form-item">
-					<label class="layui-form-label">手机号</label>
-					<div class="layui-input-block">
-						<input type="number" name="telephone" required  lay-verify="required" placeholder="请输入手机号" autocomplete="off" class="layui-input">
-					</div>
-				</div>
-				<div class="layui-form-item">
-					<div class="layui-input-block">
-						<button class="layui-btn" lay-submit lay-filter="submit">注册</button>
-						<a href="/login" class="layui-btn layui-btn-primary">有账号，去登录</a>
-					</div>
-				</div>
-			</form>
+	<div class="login layui-container">
+		<div class="login-left">
+
 		</div>
-	</div>
+		<div class="login-right">
+			<div class="layui-card">
+				<div class="layui-card-header">用户注册</div>
+				<div class="layui-card-body">
+					<form method="post" action="/register" class="layui-form">
+						<div class="layui-form-item">
+							<label class="layui-form-label">账号</label>
+							<div class="layui-input-block">
+								<input type="text" name="name" required  lay-verify="required" placeholder="请输入账号" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">密码</label>
+							<div class="layui-input-block">
+								<input type="password" name="password" required  lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">手机号</label>
+							<div class="layui-input-block">
+								<input type="number" name="telephone" required  lay-verify="required" placeholder="请输入手机号" autocomplete="off" class="layui-input">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<div class="layui-input-block">
+								<button class="layui-btn" lay-submit lay-filter="submit">注册</button>
+								<a href="/login" class="layui-btn layui-btn-primary">有账号，去登录</a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
 	</div>
 {{ template "footer" . }}
 <script>
