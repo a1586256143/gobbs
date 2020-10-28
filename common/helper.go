@@ -3,6 +3,7 @@ package common
 import (
 	"crypto/sha1"
 	"fmt"
+	"reflect"
 
 	// "gobbs/models"
 	"html/template"
@@ -41,6 +42,11 @@ func ValidateHelper(c gin.Context, validate []Validate) (success bool) {
 type Option struct {
 	K string      // 名字
 	V interface{} // 值
+}
+
+// 选项是否为空
+func (o Option) IsEmpty() bool {
+	return reflect.DeepEqual(o, Option{})
 }
 
 // 获取时间戳

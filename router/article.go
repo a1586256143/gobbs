@@ -94,6 +94,7 @@ func DetailArticle(c *gin.Context) {
 	if pullUid != userInfo.Id {
 		isFriend = models.IsFriends(userInfo.Id, pullUid)
 	}
+	fmt.Println("isFriend", isFriend)
 	find["Uid"] = pullUid
 	c.HTML(http.StatusOK, "detail.html", gin.H{
 		"isFriend":      isFriend,

@@ -53,36 +53,38 @@
 <!-- 个人信息 -->
 <div class="space-box space-userinfo">
 	<div class="space-title">
-		个人信息
+		{{ .titlePrefix }}的信息
 	</div>
 	<div class="space-info">
 		<div class="space-avatar">
-			<img src="http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
+			<img src="{{ .userInfo.Avatar }}">
 		</div>
 		<div class="space-userinfo">
 			<p>{{ .userInfo.Name }}</p>
+			{{ if not .other }}
 			<ul class="user-nav">
 				<li class="user-nav-item">
 				    <a href="/friends">
-				    	我的好友
+				    	{{ .titlePrefix }}的好友
 				    	{{ if .friendsNumber }}({{ .friendsNumber }}){{ end }}
 				    </a>
 				</li>
 				<li class="user-nav-item">
 				    <a href="/message">
-					    我的消息 
+					    {{ .titlePrefix }}的消息 
 					    {{ if .messageNumber }}
 					    <font color="red">({{ .messageNumber }})</font>
 					    {{ end }}
 					</a>
 				</li>
 				<li class="user-nav-item">
-				    <a href="javascript:;">个人信息</a>
+				    <a href="/profile">个人信息</a>
 				</li>
 				<li class="user-nav-item">
-				    <a href="javascript:;">修改密码</a>
+				    <a href="/password">修改密码</a>
 				</li>
 			</ul>
+			{{ end }}
 		</div>
 	</div>
 </div>

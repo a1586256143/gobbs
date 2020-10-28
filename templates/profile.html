@@ -1,0 +1,101 @@
+{{ template "header" . }}
+	<div class="layui-container index">
+		<div class="space-left">
+			{{ template "user-nav-left" . }}
+		</div>
+		<div class="space-right">
+			<!-- 个人信息 -->
+			<div class="space-box space-userinfo">
+				<div class="space-title">
+					我的资料
+				</div>
+				<div class="space-info">
+					<form method="post" class="layui-form">
+						<div class="layui-form-item">
+							<label class="layui-form-label">头像</label>
+							<div class="layui-input-block">
+								<div class="layui-upload">
+									<button type="button" class="layui-btn" id="test1">上传图片</button>
+									<div class="layui-upload-list">
+										<img class="layui-upload-img" id="demo1" style="width: 100px;height:100px;border-radius:50%;" src="{{ .profile.Avatar }}">
+										<p id="demoText"></p>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">账号</label>
+							<div class="layui-input-block">
+								<input type="text" required lay-verify="required" placeholder="请输入账号" readonly disabled autocomplete="off" class="layui-input" value="{{ .profile.Name }}">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<label class="layui-form-label">手机号</label>
+							<div class="layui-input-block">
+								<input type="number" name="telephone" required lay-verify="required|phone" placeholder="请输入手机号" autocomplete="off" class="layui-input" value="{{ .profile.Telephone }}">
+							</div>
+						</div>
+						<div class="layui-form-item">
+							<input type="hidden" name="avatar" value="{{ .profile.Avatar }}">
+							<div class="layui-input-block">
+								<button class="layui-btn confirm" type="button" style="display: none;">确认更新</button><button style="margin-left:0px;" class="layui-btn" type="button" lay-submit lay-filter="submit">确认更新</button> <span style="color: red">更换头像后，退出登录方可查看最新的头像</span>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+{{ template "footer" . }}
+<script>
+	//Demo
+	layui.use(['form' , 'upload'], function(){
+		var form = layui.form , upload = layui.upload;
+		$('.confirm').hide();
+		$('button[lay-submit]').show();
+		//普通图片上传
+		var uploadInst = upload.render({
+			elem: '#test1'
+			,url: '/upload' //改成您自己的上传接口
+			 , auto : false
+			 , bindAction : '.confirm'
+			,choose: function(obj){
+				//预读本地文件示例，不支持ie8
+				obj.preview(function(index, file, result){
+					$('#demo1').attr('src', result); //图片链接（base64）
+				});
+				$('.confirm').show();
+				$('button[lay-submit]').hide();
+			}
+			,done: function(res){
+				//如果上传失败
+				if(res.code > 0){
+					return layer.msg('上传失败');
+				}
+				$('input[name=avatar]').val(res.data.src);
+				//上传成功
+				$('button[lay-submit]').click();
+			}
+			,error: function(){
+				//演示失败状态，并实现重传
+				var demoText = $('#demoText');
+				demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+				demoText.find('.demo-reload').on('click', function(){
+					uploadInst.upload();
+				});
+			}
+	  	});
+
+		//监听提交
+		form.on('submit(submit)', function(data){
+			$.post('/profile' , data.field , (data) => {
+				if (data.status) {
+					layer.msg(data.msg)
+					return;
+				}
+				layer.msg(data.msg)
+			} , 'json');
+			return false;
+		});
+	});
+</script>

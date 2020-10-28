@@ -7,7 +7,7 @@
 			<div class="layui-card">
 				<div class="layui-card-header">用户注册</div>
 				<div class="layui-card-body">
-					<form method="post" action="/register" class="layui-form">
+					<form method="post" class="layui-form">
 						<div class="layui-form-item">
 							<label class="layui-form-label">账号</label>
 							<div class="layui-input-block">
@@ -52,7 +52,7 @@
 				}
 				layer.msg(data.msg)
 				setTimeout(() => {
-					window.location.href = '/';
+					window.location.href = '/space';
 				} , 1500);
 			} , 'json');
 			return false;

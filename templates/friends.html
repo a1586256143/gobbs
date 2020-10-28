@@ -15,21 +15,21 @@
 							{{ range .list }}
 							<div class="layui-row">
 								<div class="layui-col-md9">
-									<a href="/space/{{ .Uid }}">
-										<img style="width:25px;border-radius: 50%;margin-right: 7px;" src="http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
+									<a href="/space/{{ .SendUid }}">
+										<img style="width:25px;border-radius: 50%;margin-right: 7px;" src="{{ .Avatar }}">
 									</a>
-									{{ .NickName }}请求添加你为好友。附加信息：{{ .Remark }}
+									{{ .Name }}
 								</div>
 								<div class="layui-col-md3">
-									<span class="accept layui-btn layui-btn-success layui-btn-sm" data-id="{{ .Id }}" data-status="1">同意</span>
-									<span class="accept layui-btn layui-btn-danger layui-btn-sm" data-status="2">拒绝</span>
+									<span class="accept layui-btn layui-btn-success layui-btn-sm" data-id="{{ .Id }}" data-status="1">发消息</span>
+									<span class="accept layui-btn layui-btn-danger layui-btn-sm" data-status="2">删除好友</span>
 								</div>
 							</div>
 							{{ end }}
 						{{ else }}
 							<div class="layui-row">
 								<div class="layui-col-md12" style="text-align:left">
-									暂时没有信息
+									您的好友列表是空的，赶紧去<a href="/">添加</a>几个好友吧
 								</div>
 							</div>
 						{{ end }}

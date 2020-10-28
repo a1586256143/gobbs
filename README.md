@@ -4,6 +4,10 @@ golang的练手留言项目
 
 ### 预览
 ![preview1](static/images/register.png)
+![preview2](static/images/detail.png)
+![preview3](static/images/space.png)
+![preview4](static/images/message.png)
+![preview5](static/images/profile.png)
 
 ### 安装使用
 

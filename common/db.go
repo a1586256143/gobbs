@@ -12,36 +12,36 @@ var ORM Model
 
 // DB接口
 type DB interface {
-	Select(field string)  map[int]map[string]interface{}
+	Select(field string) map[int]map[string]interface{}
 }
 
 // Model类
 type Model struct {
-	Table interface{}
-	sql   string
-	order string
-	bind  []interface{}
+	Table     interface{}
+	sql       string
+	order     string
+	bind      []interface{}
 	TableName string
-	where string
+	where     string
 }
 
 // 设置表名
-func(m *Model)From(table interface{}) *Model  {
+func (m *Model) From(table interface{}) *Model {
 	m.Table = table
 	m.TableName = strings.ToLower(reflect.TypeOf(table).Elem().Name())
 	return m
 }
 
 // 解析Where条件
-func(m *Model) ParseWhere(condition map[interface{}]interface{}) string {
+func (m *Model) ParseWhere(condition map[interface{}]interface{}) string {
 	var buffer bytes.Buffer
 	buffer.Grow(len(condition))
 	var i int
 	var value []interface{}
-	for k , v := range condition{
+	for k, v := range condition {
 		buffer.WriteString(k.(string))
 		buffer.WriteString("=?")
-		value = append(value , v)
+		value = append(value, v)
 		//switch v.(type){
 		//case string :
 		//	buffer.WriteString(v.(string))
@@ -52,25 +52,30 @@ func(m *Model) ParseWhere(condition map[interface{}]interface{}) string {
 		//default :
 		//	fmt.Println("unkown" , k , v)
 		//}
-		if i != len(condition) - 1 {
+		if i != len(condition)-1 {
 			buffer.WriteString(" AND ")
 		}
-		i ++
+		i++
 	}
 	m.bind = value
 	return buffer.String()
 
 }
 
+// 执行SQL语句
+func (m *Model) SetSql(sql string) *Model {
+	m.sql = sql
+	return m
+}
+
 // where条件
-func (m *Model) Where(condition map[interface{}]interface{}) *Model  {
+func (m *Model) Where(condition map[interface{}]interface{}) *Model {
 	m.where = m.ParseWhere(condition)
 	return m
 }
 
-
 // Model实现DB接口，查询方法
-func(m *Model) Select(field string) map[int]map[string]interface{}{
+func (m *Model) Select(field string) map[int]map[string]interface{} {
 	execSql := "SELECT " + field + " FROM " + m.TableName
 	if m.where != "" {
 		execSql += " WHERE " + m.where
@@ -83,7 +88,7 @@ func(m *Model) Select(field string) map[int]map[string]interface{}{
 }
 
 // Model实现DB接口，查询方法
-func(m *Model) Find(field string) map[string]interface{}{
+func (m *Model) Find(field string) map[string]interface{} {
 	execSql := "SELECT " + field + " FROM " + m.TableName
 	if m.where != "" {
 		execSql += " WHERE " + m.where
@@ -104,69 +109,73 @@ func (m *Model) Count(field string) string {
  * common.ORM.Insert(Article{Id:1,Title:111})
  * 返回插入的ID
  */
-func (m *Model) Insert(table interface{}) (int64 , error) {
+func (m *Model) Insert(table interface{}) (int64, error) {
 	m.From(table)
-	joinFields , joinValues , values := GetModelInfo(table)
+	joinFields, joinValues, values := GetModelInfo(table)
 	s := "INSERT INTO " + m.TableName + "(" + joinFields + ") VALUES (" + joinValues + ")"
-	rst , err := MysqlDb.Exec(s, values ...)
+	rst, err := MysqlDb.Exec(s, values...)
 	if err == nil {
-		rowsAffected , _ := rst.RowsAffected()
-		lastInsertID,_ := rst.LastInsertId()
+		rowsAffected, _ := rst.RowsAffected()
+		lastInsertID, _ := rst.LastInsertId()
 		if rowsAffected >= 1 {
-			return lastInsertID , nil
+			return lastInsertID, nil
 		}
 	}
-	return 0 , nil
+	return 0, nil
 }
 
 // 排序
-func(m *Model) Order(order string) *Model {
+func (m *Model) Order(order string) *Model {
 	m.order = order
-	split := strings.Split(order , " ")
+	split := strings.Split(order, " ")
 	if len(split) == 1 {
 		split = append(split, "DESC")
 	}
-	m.order = strings.Join(split , " ")
+	m.order = strings.Join(split, " ")
 	return m
 }
 
 // 执行SQL语句
-func (m *Model) execute() map[int]map[string]interface{}{
-	rows, err := MysqlDb.Query(m.sql , m.bind... )
+func (m *Model) execute() map[int]map[string]interface{} {
+	rows, err := MysqlDb.Query(m.sql, m.bind...)
 	defer func() {
 		m.clear()
 		rows.Close()
 	}()
 	if rows != nil && err == nil {
-		cols , _ := rows.Columns()
+		cols, _ := rows.Columns()
 		values := make([]sql.RawBytes, len(cols))
 		scans := make([]interface{}, len(cols))
 
 		// 将接口指针转换为指针类型的接口
-		for i := range values{
+		for i := range values {
 			scans[i] = &values[i]
 		}
 		results := make(map[int]map[string]interface{})
 		i := 0
 		for rows.Next() {
-			if err := rows.Scan(scans...); err != nil{
-				fmt.Println("error , " , err)
+			if err := rows.Scan(scans...); err != nil {
+				fmt.Println("error , ", err)
 			}
 			row := make(map[string]interface{})
 
-			for j , value := range values { //注意：此处用values
+			for j, value := range values { //注意：此处用values
 				key := AutoTuoFeng(cols[j])
 				row[key] = string(value)
 			}
 			results[i] = row
-			i ++
+			i++
 		}
 		return results
 
-	}else {
-		fmt.Println("execute error : " , err)
+	} else {
+		fmt.Println("execute error : ", err)
 	}
 	return nil
+}
+
+func (m *Model) QuerySql() map[int]map[string]interface{} {
+	return m.execute()
 }
 
 // 获取SQL语句
@@ -175,7 +184,7 @@ func (m *Model) GetSql() string {
 }
 
 // 情理
-func (m *Model) clear()  {
-	m.where , m.order = "" , ""
-	m.bind = make([]interface{} , 0)
+func (m *Model) clear() {
+	m.where, m.order = "", ""
+	m.bind = make([]interface{}, 0)
 }

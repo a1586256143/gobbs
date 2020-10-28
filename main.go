@@ -76,10 +76,10 @@ func main() {
 	router.POST("/upload", AuthMiddleware(), handler.UploadImg)
 
 	// 个人空间
-	router.GET("/space", handler.SpacePage)
+	router.GET("/space", AuthMiddleware(), handler.SpacePage)
 
 	// 其它用户的空间
-	router.GET("/space/:uid", handler.SpacePage)
+	router.GET("/space/:uid", handler.OtherSpacePage)
 
 	// 加好友
 	router.POST("/add-friends/:uid", AuthMiddleware(), handler.AddFriends)
@@ -92,5 +92,14 @@ func main() {
 
 	// 我的好友
 	router.GET("/friends", AuthMiddleware(), handler.Friends)
+
+	// 个人信息
+	router.GET("/profile", AuthMiddleware(), handler.Profile)
+
+	// 修改个人信息
+	router.POST("/profile", AuthMiddleware(), handler.SaveProfile)
+
+	// 修改密码
+	router.Any("/password", AuthMiddleware(), handler.Password)
 	_ = router.Run(":9999")
 }

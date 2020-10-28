@@ -76,22 +76,34 @@ func LoginPage(c *gin.Context) {
 // 个人中心
 func SpacePage(c *gin.Context) {
 	cid := c.DefaultQuery("cid", "0")
-	uid := c.Param("uid")
 	cookie, _ := c.Cookie("user")
 	// 获取用户信息
 	userInfo := models.GetUserInfo(cookie)
-	// 自己刷新时不更新浏览数
-	if uid != "" && uid != strconv.FormatInt(userInfo.Id, 10) {
-		models.UpdateViews(uid)
-	}
-	conditionUid := uid
-	if conditionUid == "" {
-		conditionUid = strconv.FormatInt(userInfo.Id, 10)
-	}
 	condition := map[interface{}]interface{}{
 		"status": 0,
 		"cid":    cid,
-		"uid":    conditionUid,
+		"uid":    strconv.FormatInt(userInfo.Id, 10),
+	}
+	if condition["cid"] == "0" {
+		delete(condition, "cid")
+	}
+	articles := models.GetAllArticle(condition)
+	data := gin.H{
+		"list": articles,
+	}
+	commonData := UserNavData(c, common.Option{})
+	c.HTML(http.StatusOK, "space.html", common.MergeMap(data, commonData))
+}
+
+// 其它用户个人中心
+func OtherSpacePage(c *gin.Context) {
+	cid := c.DefaultQuery("cid", "0")
+	uid := c.Param("uid")
+	models.UpdateViews(uid)
+	condition := map[interface{}]interface{}{
+		"status": 0,
+		"cid":    cid,
+		"uid":    uid,
 	}
 	if condition["cid"] == "0" {
 		delete(condition, "cid")
@@ -157,25 +169,39 @@ func Message(c *gin.Context) {
 
 // 用户导航公共数据
 func UserNavData(c *gin.Context, option common.Option) gin.H {
-	fmt.Println(option)
-	cookie, _ := c.Cookie("user")
-	// 获取用户信息
-	userInfo := models.GetUserInfo(cookie)
+	fmt.Println("options is ", option)
+	var (
+		userInfo      models.User
+		applyNumber   int64
+		friendsNumber int64
+		uid           string
+		other         int
+		titlePrefix   string
+	)
 	lastTime := "暂无"
-	// 处理最后登录时间
-	if userInfo.Last_time != 0 {
-		lastTime = common.DateFormat(userInfo.Last_time)
-	}
-	// 申请的数量
-	applyNumber := models.GetFriendsApplyNumber(userInfo.Id)
-	// 我的好友数量
-	friendsNumber := models.GetFriendsNumber(userInfo.Id)
-	var uid string
-	uid = strconv.FormatInt(userInfo.Id, 10)
-	if option.K == "uid" && option.V != "" {
+	if option.IsEmpty() {
+		cookie, _ := c.Cookie("user")
+		// 获取用户信息
+		userInfo = models.GetUserInfo(cookie)
+		// 处理最后登录时间
+		if userInfo.Last_time != 0 {
+			lastTime = common.DateFormat(userInfo.Last_time)
+		}
+		// 申请的数量
+		applyNumber = models.GetFriendsApplyNumber(userInfo.Id)
+		// 我的好友数量
+		friendsNumber = models.GetFriendsNumber(userInfo.Id)
+		uid = strconv.FormatInt(userInfo.Id, 10)
+		other = 0
+		titlePrefix = "我"
+	} else if option.K == "uid" && option.V != "" {
+		parseUid, _ := strconv.ParseInt(option.V.(string), 10, 64)
+		base := models.GetUserBase(parseUid)
+		userInfo = models.User{Id: parseUid, Name: base["Name"].(string), Avatar: base["Avatar"].(string)}
 		uid = option.V.(string)
+		other = 1
+		titlePrefix = "他(她)"
 	}
-	fmt.Println(userInfo)
 	return gin.H{
 		"today":         models.GetTodayNumber(uid), // 当天的统计
 		"week":          models.GetWeekNumber(uid),  // 本周的统计
@@ -184,6 +210,8 @@ func UserNavData(c *gin.Context, option common.Option) gin.H {
 		"lastTime":      lastTime,
 		"messageNumber": applyNumber,
 		"friendsNumber": friendsNumber,
+		"other":         other,
+		"titlePrefix":   titlePrefix,
 	}
 }
 
@@ -203,5 +231,81 @@ func Accept(c *gin.Context) {
 func Friends(c *gin.Context) {
 	data := gin.H{}
 	commonData := UserNavData(c, common.Option{})
+	list := models.GetMyFriendsList(commonData["userInfo"].(models.User).Id)
+	data["list"] = list
 	c.HTML(http.StatusOK, "friends.html", common.MergeMap(data, commonData))
+}
+
+// 个人资料
+func Profile(c *gin.Context) {
+	data := gin.H{}
+	commonData := UserNavData(c, common.Option{})
+	profile := models.GetUserProfile(commonData["userInfo"].(models.User).Id, "*")
+	data["profile"] = profile
+	c.HTML(http.StatusOK, "profile.html", common.MergeMap(data, commonData))
+}
+
+// 保存个人资料
+func SaveProfile(c *gin.Context) {
+	phone := c.DefaultPostForm("telephone", "")
+	avatar := c.DefaultPostForm("avatar", "")
+	// 校验开始
+	validate := []common.Validate{
+		{"telephone", "手机号不能为空"},
+	}
+	success := common.ValidateHelper(*c, validate)
+	if success == false {
+		return
+	}
+	cookie, _ := c.Cookie("user")
+	uid := models.GetUserInfo(cookie).Id
+	status := models.UpdateUserProfile(uid, phone, avatar)
+	if status == false {
+		c.JSON(200, common.Error("更新失败，请重新尝试"))
+		return
+	}
+	c.JSON(200, common.Success("更新成功"))
+}
+
+// 修改密码
+func Password(c *gin.Context) {
+	if c.Request.Method == "POST" {
+		password := c.PostForm("password")
+		newPassword := c.PostForm("new_password")
+		rePassword := c.PostForm("re_password")
+		// 校验开始
+		validate := []common.Validate{
+			{"password", "原密码不能为空"},
+			{"new_password", "新密码不能为空"},
+			{"re_password", "确认密码不能为空"},
+		}
+		success := common.ValidateHelper(*c, validate)
+		if success == false {
+			return
+		}
+		if rePassword != newPassword {
+			c.JSON(200, common.Error("两次密码输入不一致"))
+			return
+		}
+		cookie, _ := c.Cookie("user")
+		uid := models.GetUserInfo(cookie).Id
+		userPassword := models.GetUserProfile(uid, "password,avatar")
+		if userPassword["Password"] != common.PasswordEncode(password) {
+			c.JSON(200, common.Error("原密码不正确"))
+			return
+		}
+		status := models.UpdatePassword(uid, common.PasswordEncode(newPassword))
+		if status == false {
+			c.JSON(200, common.Error("修改失败"))
+			return
+		}
+		models.DeleteLoginCookie(c, "user")
+		c.JSON(200, common.Success("修改成功，请重新登录"))
+		return
+	}
+	data := gin.H{}
+	commonData := UserNavData(c, common.Option{})
+	// profile := models.GetUserProfile(commonData["userInfo"].(models.User).Id, "*")
+	// data["profile"] = profile
+	c.HTML(http.StatusOK, "password.html", common.MergeMap(data, commonData))
 }
