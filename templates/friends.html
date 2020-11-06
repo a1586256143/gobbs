@@ -21,8 +21,8 @@
 									{{ .Name }}
 								</div>
 								<div class="layui-col-md3">
-									<span class="accept layui-btn layui-btn-success layui-btn-sm" data-id="{{ .Id }}" data-status="1">发消息</span>
-									<span class="accept layui-btn layui-btn-danger layui-btn-sm" data-status="2">删除好友</span>
+									<span class="layui-btn layui-btn-success layui-btn-sm">发消息</span>
+									<span class="delete layui-btn layui-btn-danger layui-btn-sm" data-id="{{ .Id }}">删除好友</span>
 								</div>
 							</div>
 							{{ end }}
@@ -42,19 +42,23 @@
 <script>
 	//Demo
 	layui.use('form', function(){
-		$('.accept').click(function(){
-			let id = $(this).attr('data-id') , status = $(this).attr('data-status')
-			if (id && status) {
-				$.post('/accept' , {id : id , status : status} , function(data){
-					if (data.status) {
-                        layer.msg(data.msg)
-                        return;
-                    }
-                    layer.msg(data.msg);
-                    setTimeout(function(){
-                    	window.location.reload();
-                    } , 1500)
-				})
+		$('.delete').click(function(){
+			let id = $(this).attr('data-id')
+			if (id) {
+				layer.confirm('删除确认？', {icon: 3, title:'删除好友'}, function(index){
+					//do something
+					layer.close(index);
+					$.post('/deleteFriend' , {id : id} , function(data){
+						if (data.status) {
+	                        layer.msg(data.msg)
+	                        return;
+	                    }
+	                    layer.msg(data.msg);
+	                    setTimeout(function(){
+	                    	window.location.reload();
+	                    } , 1500)
+					})
+				});
 			}
 		})
 	});

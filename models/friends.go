@@ -104,7 +104,7 @@ func Accept(id, status int64) bool {
 
 // 获取我的好友
 func GetMyFriendsList(uid int64) map[int]map[string]interface{} {
-	sql := fmt.Sprintf("SELECT uid,pull_uid FROM friends where (uid = %d OR pull_uid = %d) and status = 1", uid, uid)
+	sql := fmt.Sprintf("SELECT id,uid,pull_uid FROM friends where (uid = %d OR pull_uid = %d) and status = 1", uid, uid)
 	list := common.ORM.SetSql(sql).QuerySql()
 	for _, value := range list {
 		var info map[string]interface{}
@@ -122,4 +122,15 @@ func GetMyFriendsList(uid int64) map[int]map[string]interface{} {
 		value["Avatar"] = info["Avatar"]
 	}
 	return list
+}
+
+// 删除好友
+func DeleteFriend(id string, uid int64) bool {
+	sql := "UPDATE friends set status = 88 WHERE id = ? AND (uid = ? OR pull_uid = ?) and status = 1"
+	res, _ := common.MysqlDb.Exec(sql, id, uid, uid)
+	affect, _ := res.RowsAffected()
+	if affect > 0 {
+		return true
+	}
+	return false
 }

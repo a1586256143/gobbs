@@ -93,6 +93,9 @@ func main() {
 	// 我的好友
 	router.GET("/friends", AuthMiddleware(), handler.Friends)
 
+	// 删除好友
+	router.POST("/deleteFriend", AuthMiddleware(), handler.DelFriends)
+
 	// 个人信息
 	router.GET("/profile", AuthMiddleware(), handler.Profile)
 
@@ -100,6 +103,8 @@ func main() {
 	router.POST("/profile", AuthMiddleware(), handler.SaveProfile)
 
 	// 修改密码
-	router.Any("/password", AuthMiddleware(), handler.Password)
+	router.GET("/password", AuthMiddleware(), handler.Password)
+	router.POST("/password", AuthMiddleware(), handler.Password)
+
 	_ = router.Run(":9999")
 }

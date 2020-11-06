@@ -14,6 +14,12 @@ body{
 .nav-container{
 	background: #393D49;
 }
+.nav-container .layui-container{
+	display: flex;
+}
+.layui-nav{
+	width: calc(100% - 200px);
+}
 .list .layui-row{
 	margin-bottom: 1rem;
 	background: white;
@@ -170,4 +176,17 @@ body{
 }
 .flex{
 	display: flex;
+}
+.user-container{
+	width: 200px;
+}
+.layui-nav .layui-nav-item a{
+	overflow: hidden;
+    width: 100%;
+}
+.user-login.layui-nav{
+	width:calc(100% - 160px);
+}
+.user-container.user-login{
+	width:160px;
 }

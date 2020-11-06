@@ -236,6 +236,23 @@ func Friends(c *gin.Context) {
 	c.HTML(http.StatusOK, "friends.html", common.MergeMap(data, commonData))
 }
 
+// 删除好友
+func DelFriends(c *gin.Context) {
+	id := c.DefaultPostForm("id", "0")
+	if id == "0" {
+		c.JSON(200, common.Error("好友不存在"))
+		return
+	}
+	cookie, _ := c.Cookie("user")
+	uid := models.GetUserInfo(cookie).Id
+	status := models.DeleteFriend(id, uid)
+	if status {
+		c.JSON(200, common.Success("删除成功"))
+		return
+	}
+	c.JSON(200, common.Error("删除失败"))
+}
+
 // 个人资料
 func Profile(c *gin.Context) {
 	data := gin.H{}

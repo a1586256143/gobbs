@@ -26,10 +26,10 @@
                         <div class="user-box">
                             <div class="user-head">
                                 <div class="user-avatar">
-                                    <img src="http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
+                                    <img src="{{ .Avatar }}">
                                 </div>
                                 <div class="user-info">
-                                    <p>张三</p>
+                                    <p>{{ .Name }}</p>
                                     <p>{{ .FormatTime }}</p>
                                 </div>
                             </div>
@@ -68,7 +68,7 @@
         <div class="right" style="width: 23%;margin-left: 2%;">
                 <div class="space-info">
                     <div class="space-avatar">
-                        <img src="http://tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg">
+                        <img src="{{ .find.Avatar }}">
                     </div>
                     <div class="space-userinfo">
                         <p>{{ .find.NickName }}</p>

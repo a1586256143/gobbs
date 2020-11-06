@@ -71,7 +71,11 @@ func DetailArticle(c *gin.Context) {
 	var content interface{}
 	content = find["Content"]
 	find["Content"] = template.HTML(content.(string))
-	find["NickName"] = models.GetUserName(find["Uid"].(string))
+	// 获取发布用户的信息
+	baseUid, _ := strconv.ParseInt(find["Uid"].(string), 10, 64)
+	baseInfo := models.GetUserBase(baseUid)
+	find["NickName"] = baseInfo["Name"]
+	find["Avatar"] = baseInfo["Avatar"]
 	captchaId := common.GetCaptchaId()
 	// 查询评论
 	commentMaps := map[interface{}]interface{}{
@@ -83,6 +87,10 @@ func DetailArticle(c *gin.Context) {
 		if v["CreateTime"] != "0" {
 			v["FormatTime"] = common.FormatTime(v["CreateTime"].(string))
 		}
+		listUid, _ := strconv.ParseInt(v["Uid"].(string), 10, 64)
+		info := models.GetUserBase(listUid)
+		v["Name"] = info["Name"]
+		v["Avatar"] = info["Avatar"]
 	}
 	// 获取用户信息
 	userInfo := models.GetUserInfo(common.GetUid(c))

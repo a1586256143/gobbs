@@ -9,19 +9,26 @@
 </head>
 <body>
 	<div class="nav-container">
-		<ul class="layui-nav layui-container" lay-filter="">
-			<li class="layui-nav-item">畅所欲言</li>
-			<li class="layui-nav-item"><a href="/">最新发布</a></li>
-			{{ if .userInfo.Id }}
-				<li class="layui-nav-item">
-					<a href="/space">{{ .userInfo.Name }}</a>
-				</li>
-				<li class="layui-nav-item"><a href="/logout">退出</a></li>
-			{{ else }}
-				<li class="layui-nav-item"><a href="/login">登录</a></li>
-				<li class="layui-nav-item"><a href="/register">注册</a></li>
-			{{ end }}
-		</ul>
+		<div class="layui-container">
+			<ul class="layui-nav {{ if .userInfo.Id }}user-login{{ end }}" lay-filter="">
+				<li class="layui-nav-item"><a href="/">真言社区</a></li>
+			</ul>
+			<ui class="layui-nav user-container {{ if .userInfo.Id }}user-login{{ end }}" lay-filter="">
+				{{ if .userInfo.Id }}
+					<li class="layui-nav-item">
+						<a href="/space"><img src="{{ .userInfo.Avatar }}" class="layui-nav-img"> {{ .userInfo.Name }}</a>
+						<dl class="layui-nav-child">
+							<dd><a href="/profile">个人信息</a></dd>
+							<dd><a href="/password">修改密码</a></dd>
+							<dd><a href="/logout">退出</a></dd>
+						</dl>
+					</li>
+				{{ else }}
+					<li class="layui-nav-item"><a href="/login">登录</a></li>
+					<li class="layui-nav-item"><a href="/register">注册</a></li>
+				{{ end }}
+			</ui>
+		</div>
 	</div>
 	<br>
 {{ end }}
@@ -82,6 +89,9 @@
 				</li>
 				<li class="user-nav-item">
 				    <a href="/password">修改密码</a>
+				</li>
+				<li class="user-nav-item">
+					<a href="/logout">退出</a>
 				</li>
 			</ul>
 			{{ end }}
